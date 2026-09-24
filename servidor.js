@@ -6,7 +6,7 @@ const { analizarWeb } = require('./motor/web');
 const { analizarInstagram, analizarTikTok } = require('./motor/redes');
 
 const PUERTO = process.env.PUERTO || 4321;
-const RAIZ = __dirname;
+const RAIZ = path.join(__dirname, 'public');
 
 const TIPOS = {
   '.html': 'text/html; charset=utf-8',
