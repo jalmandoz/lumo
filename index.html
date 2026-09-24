@@ -134,6 +134,10 @@
       font-weight:800;
       font-size:.86em;
       letter-spacing:-.05em;
+      /* el interletrado negativo tambien se aplica detras de la o y le recorta
+         el borde: le devolvemos ese aire sin mover nada de sitio */
+      padding-right:.07em;
+      margin-right:-.07em;
       display:inline-block;
       color:var(--vino);
       opacity:0;
@@ -324,6 +328,7 @@
       font-weight:800;
       font-size:clamp(3rem,12vw,5.2rem);
       letter-spacing:-.05em;
+      padding-right:.07em;
       line-height:1;
       color:var(--vino);
       margin-bottom:38px;
