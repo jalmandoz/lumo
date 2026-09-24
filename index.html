@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lumo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Unbounded:wght@600;800&display=swap">
+
+  <style>
+    /* ---------- tokens ---------- */
+    :root{
+      --blanco:#FFFFFF;
+      --tinta:#0B0005;
+      --texto:#1A0710;
+      --apagado:#6E5A63;
+      --linea:rgba(11,0,5,.10);
+
+      --rosa:#B21A52;
+      --vino:#70012B;
+      --vino-hondo:#25000E;
+      --negro:#000000;
+
+      --fuente-marca:'Unbounded', sans-serif;
+      --fuente-texto:'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* ---------- base ---------- */
+    *{box-sizing:border-box;}
+    html,body{margin:0;padding:0;}
+    body{
+      background:var(--blanco);
+      color:var(--texto);
+      font-family:var(--fuente-texto);
+      font-size:16px;
+      line-height:1.6;
+      -webkit-font-smoothing:antialiased;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .contenedor{
+      width:100%;
+      max-width:1180px;
+      margin:0 auto;
+      padding:0 32px;
+    }
+    @media (max-width:640px){
+      .contenedor{padding:0 20px;}
+    }
+
+    /* ---------- cabecera ---------- */
+    .cabecera{
+      padding:26px 0;
+      border-bottom:1px solid var(--linea);
+    }
+    .cabecera .contenedor{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:24px;
+    }
+    .marca{
+      display:inline-flex;
+      align-items:center;
+      text-decoration:none;
+    }
+    .marca svg{
+      height:30px;
+      width:auto;
+      display:block;
+    }
+    .marca:focus-visible{
+      outline:2px solid var(--rosa);
+      outline-offset:6px;
+    }
+
+    /* ---------- lienzo ---------- */
+    .lienzo{
+      flex:1;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="cabecera">
+    <div class="contenedor">
+
+      <a class="marca" href="/" aria-label="Lumo, inicio">
+        <svg viewBox="0 0 520 132" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lumo">
+          <defs>
+            <linearGradient id="lumo-rasante" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stop-color="#B21A52"/>
+              <stop offset="34%"  stop-color="#70012B"/>
+              <stop offset="72%"  stop-color="#25000E"/>
+              <stop offset="100%" stop-color="#000000"/>
+            </linearGradient>
+          </defs>
+          <text x="260" y="98" text-anchor="middle"
+                font-family="Unbounded, sans-serif" font-weight="800"
+                font-size="86" letter-spacing="-2" fill="url(#lumo-rasante)">lumo</text>
+        </svg>
+      </a>
+
+    </div>
+  </header>
+
+  <main class="lienzo">
+    <div class="contenedor">
+      <!-- Aquí vamos construyendo, paso a paso -->
+    </div>
+  </main>
+
+</body>
+</html>
