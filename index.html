@@ -286,9 +286,213 @@
       .caja{padding-left:22px;}
     }
 
+
+    /* ================= ANALISIS PASO A PASO ================= */
+    .pantalla{position:relative;z-index:2;}
+    .pantalla[hidden]{display:none !important;}
+
+    .entrada.saliendo .bloque{
+      animation:salir .5s var(--curva-suave) forwards;
+    }
+    @keyframes salir{
+      to{opacity:0;transform:translateY(-26px) scale(.97);}
+    }
+
+    .analisis{
+      min-height:100svh;
+      display:flex;align-items:center;justify-content:center;
+      padding:56px 28px;
+    }
+    .panel{
+      width:100%;max-width:880px;
+      display:flex;flex-direction:column;
+      animation:entrar-panel .7s var(--curva) both;
+    }
+    @keyframes entrar-panel{
+      from{opacity:0;transform:translateY(34px) scale(.98);}
+      to  {opacity:1;transform:none;}
+    }
+
+    /* cabecera */
+    .panel-top{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:18px;margin-bottom:30px;
+    }
+    .objetivo{display:flex;flex-direction:column;gap:2px;min-width:0;}
+    .objetivo .et{
+      font-size:.74rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+      color:var(--rosa);
+    }
+    .objetivo .dir{
+      font-size:1.12rem;font-weight:700;color:var(--negro-texto);
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .volver{
+      flex:0 0 auto;
+      font-family:var(--fuente);font-size:.92rem;font-weight:600;
+      color:var(--apagado);background:none;border:none;cursor:pointer;
+      padding:10px 4px;
+      transition:color .25s var(--curva-suave);
+    }
+    .volver:hover{color:var(--vino);}
+
+    /* barra de pasos */
+    .rieles{display:flex;align-items:center;gap:0;margin-bottom:34px;}
+    .riel{display:flex;align-items:center;flex:1;min-width:0;}
+    .riel:last-child{flex:0 0 auto;}
+    .punto{
+      width:34px;height:34px;flex:0 0 auto;border-radius:11px;
+      display:grid;place-items:center;
+      background:#F1EBEE;color:#A8919B;
+      font-size:.82rem;font-weight:800;
+      transition:background .45s var(--curva), color .45s var(--curva), transform .45s var(--curva);
+    }
+    .riel.hecho .punto{background:#F3D9E3;color:var(--vino);}
+    .riel.actual .punto{background:var(--vino);color:var(--blanco);transform:scale(1.14);}
+    .punto svg{width:15px;height:15px;}
+    .linea{
+      height:2px;flex:1;min-width:10px;margin:0 8px;
+      background:#EEE6EA;position:relative;overflow:hidden;
+    }
+    .linea::after{
+      content:"";position:absolute;inset:0;
+      background:linear-gradient(90deg,var(--rosa),var(--vino));
+      transform:scaleX(0);transform-origin:left center;
+      transition:transform .55s var(--curva);
+    }
+    .riel.hecho .linea::after{transform:scaleX(1);}
+
+    /* tarjeta del paso */
+    .tarjeta{
+      border:1.5px solid var(--linea);
+      border-radius:22px;
+      background:rgba(255,255,255,.78);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      padding:34px;
+      box-shadow:0 26px 60px -34px rgba(112,1,43,.34);
+    }
+    @media (max-width:620px){ .tarjeta{padding:24px 20px;} }
+
+    .paso-cab{display:flex;flex-direction:column;gap:6px;margin-bottom:24px;}
+    .paso-tit{
+      font-size:clamp(1.6rem,4.4vw,2.3rem);
+      font-weight:900;letter-spacing:-.03em;line-height:1.08;
+      margin:0;color:var(--negro-texto);
+    }
+    .paso-sub{margin:0;color:var(--apagado);font-size:1rem;font-weight:500;}
+
+    /* escaneo */
+    .escaneo{display:flex;flex-direction:column;gap:14px;padding:6px 0 4px;}
+    .chequeo{
+      display:flex;align-items:center;gap:13px;
+      font-size:1rem;font-weight:500;color:var(--apagado);
+      opacity:0;transform:translateX(-10px);
+      transition:opacity .4s var(--curva), transform .4s var(--curva), color .4s var(--curva);
+    }
+    .chequeo.viva{opacity:1;transform:none;}
+    .chequeo.listo{color:var(--negro-texto);}
+    .aro{
+      width:22px;height:22px;flex:0 0 auto;border-radius:50%;
+      border:2px solid #E4D4DC;border-top-color:var(--rosa);
+      animation:girar-aro .7s linear infinite;
+    }
+    @keyframes girar-aro{to{transform:rotate(360deg);}}
+    .chequeo.listo .aro{
+      animation:none;border-color:var(--vino);background:var(--vino);
+      display:grid;place-items:center;
+    }
+    .chequeo.listo .aro::after{
+      content:"";width:9px;height:5px;
+      border-left:2px solid #fff;border-bottom:2px solid #fff;
+      transform:rotate(-45deg) translate(1px,-1px);
+    }
+
+    /* resultado */
+    .resultado{display:none;}
+    .resultado.viva{display:block;}
+
+    .marcador{
+      display:flex;align-items:center;gap:22px;
+      padding-bottom:24px;margin-bottom:22px;
+      border-bottom:1px solid var(--linea);
+    }
+    .aguja{position:relative;width:104px;height:104px;flex:0 0 auto;}
+    .aguja svg{transform:rotate(-90deg);display:block;width:100%;height:100%;}
+    .aguja .pista{fill:none;stroke:#F1E6EB;stroke-width:9;}
+    .aguja .valor{
+      fill:none;stroke:url(#degradado-aguja);stroke-width:9;stroke-linecap:round;
+      transition:stroke-dashoffset 1.15s var(--curva);
+    }
+    .aguja .cifra{
+      position:absolute;inset:0;display:grid;place-items:center;
+      font-size:1.72rem;font-weight:900;letter-spacing:-.04em;
+      color:var(--negro-texto);
+      font-variant-numeric:tabular-nums;
+    }
+    .veredicto{display:flex;flex-direction:column;gap:4px;min-width:0;}
+    .veredicto .nivel{
+      font-size:1.3rem;font-weight:900;letter-spacing:-.025em;color:var(--negro-texto);
+    }
+    .veredicto .frase{color:var(--apagado);font-size:1rem;font-weight:500;margin:0;}
+
+    .hallazgos{display:flex;flex-direction:column;gap:12px;}
+    .hallazgo{
+      display:flex;gap:14px;align-items:flex-start;
+      padding:16px 18px;border-radius:16px;
+      background:#FBF7F9;
+      border:1px solid rgba(11,0,5,.07);
+      opacity:0;transform:translateY(14px);
+    }
+    .hallazgo.viva{animation:asomar-suave .6s var(--curva) forwards;}
+    .hallazgo.bien{background:#F4FAF6;border-color:rgba(24,106,74,.14);}
+    .senal{
+      width:26px;height:26px;flex:0 0 auto;border-radius:9px;
+      display:grid;place-items:center;
+      background:var(--rosa);color:#fff;
+    }
+    .hallazgo.bien .senal{background:#186A4A;}
+    .senal svg{width:14px;height:14px;}
+    .hallazgo .cuerpo{display:flex;flex-direction:column;gap:3px;min-width:0;}
+    .hallazgo .t{font-weight:800;font-size:1rem;color:var(--negro-texto);letter-spacing:-.01em;}
+    .hallazgo .d{font-size:.95rem;color:var(--apagado);font-weight:500;}
+
+    .pie{
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+      margin-top:26px;padding-top:22px;border-top:1px solid var(--linea);
+    }
+    .cuenta{font-size:.9rem;font-weight:600;color:var(--apagado);font-variant-numeric:tabular-nums;}
+
+    /* resumen final */
+    .total{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;margin-bottom:28px;}
+    .total .aguja{width:148px;height:148px;}
+    .total .aguja .cifra{font-size:2.5rem;}
+    .total .nivel{font-size:clamp(1.7rem,4.6vw,2.4rem);font-weight:900;letter-spacing:-.035em;margin-top:8px;}
+    .total .frase{color:var(--apagado);max-width:46ch;margin:0;font-weight:500;}
+    .lista-arreglos{display:flex;flex-direction:column;gap:10px;}
+    .arreglo{
+      display:flex;gap:14px;align-items:center;
+      padding:15px 18px;border-radius:14px;
+      border:1px solid var(--linea);
+      opacity:0;transform:translateY(14px);
+    }
+    .arreglo.viva{animation:asomar-suave .55s var(--curva) forwards;}
+    .arreglo .num{
+      width:28px;height:28px;flex:0 0 auto;border-radius:9px;
+      background:var(--vino);color:#fff;
+      display:grid;place-items:center;font-size:.82rem;font-weight:800;
+    }
+    .arreglo .txt{font-weight:600;font-size:1rem;color:var(--negro-texto);}
+    .arreglo .de{margin-left:auto;font-size:.8rem;font-weight:700;color:var(--apagado);white-space:nowrap;}
+
+    .aviso{
+      margin-top:22px;font-size:.84rem;color:var(--apagado);
+      text-align:center;font-weight:500;
+    }
+
     @media (prefers-reduced-motion:reduce){
       *,*::before,*::after{animation:none !important;transition:none !important;}
-      .letra,.logo,.acciones{opacity:1;transform:none;filter:none;}
+      .letra,.logo,.acciones,.hallazgo,.arreglo,.chequeo{opacity:1;transform:none;filter:none;}
       .logo{background-position:0 0;}
       .foco{display:none;}
     }
@@ -303,7 +507,7 @@
   </div>
   <div class="foco" id="foco" aria-hidden="true"></div>
 
-  <main class="entrada">
+  <main class="entrada pantalla" id="pantalla-entrada">
     <div class="bloque">
 
       <h1 class="titular" data-texto="Bienvenid@ a" data-marca="si">
@@ -315,9 +519,9 @@
       <div class="acciones">
         <button class="boton" id="redes" type="button" aria-pressed="false">Pon tus redes si no tienes</button>
 
-        <form class="caja" id="caja" action="#" method="get">
+        <form class="caja" id="caja" action="#" method="get" novalidate>
           <label for="url" hidden>Dirección de tu página</label>
-          <input id="url" name="url" type="url" inputmode="url" autocomplete="url" placeholder="">
+          <input id="url" name="url" type="text" inputmode="url" autocomplete="url" spellcheck="false" placeholder="">
           <button class="enviar" type="submit" aria-label="Calificar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M4 12h15"/><path d="M13 6l6 6-6 6"/>
@@ -328,6 +532,63 @@
 
     </div>
   </main>
+
+
+  <section class="analisis pantalla" id="pantalla-analisis" hidden>
+    <div class="panel">
+
+      <div class="panel-top">
+        <div class="objetivo">
+          <span class="et" id="et-objetivo">Revisando tu página</span>
+          <span class="dir" id="dir-objetivo"></span>
+        </div>
+        <button class="volver" id="volver" type="button">Empezar de nuevo</button>
+      </div>
+
+      <div class="rieles" id="rieles"></div>
+
+      <div class="tarjeta">
+        <div class="paso-cab">
+          <h2 class="paso-tit" id="paso-tit"></h2>
+          <p class="paso-sub" id="paso-sub"></p>
+        </div>
+
+        <div class="escaneo" id="escaneo"></div>
+
+        <div class="resultado" id="resultado">
+          <div class="marcador">
+            <div class="aguja">
+              <svg width="104" height="104" viewBox="0 0 104 104" aria-hidden="true">
+                <defs>
+                  <linearGradient id="degradado-aguja" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#B21A52"/>
+                    <stop offset="100%" stop-color="#25000E"/>
+                  </linearGradient>
+                </defs>
+                <circle class="pista" cx="52" cy="52" r="45"/>
+                <circle class="valor" id="aro-valor" cx="52" cy="52" r="45"
+                        stroke-dasharray="282.7" stroke-dashoffset="282.7"/>
+              </svg>
+              <span class="cifra" id="cifra">0</span>
+            </div>
+            <div class="veredicto">
+              <span class="nivel" id="nivel"></span>
+              <p class="frase" id="frase"></p>
+            </div>
+          </div>
+          <div class="hallazgos" id="hallazgos"></div>
+        </div>
+
+        <div class="pie">
+          <span class="cuenta" id="cuenta"></span>
+          <button class="boton" id="siguiente" type="button" style="height:60px;padding:0 32px;">Siguiente</button>
+        </div>
+      </div>
+
+      <p class="aviso">Ejemplo de demostración. Los puntajes todavía no salen de tu página de verdad.</p>
+
+    </div>
+  </section>
 
   <script>
   (function(){
@@ -450,7 +711,7 @@
 
     /* ---------- el boton alterna entre pagina y redes ---------- */
     const textos = {
-      pagina:{boton:'Pon tus redes si no tienes', etiqueta:'Dirección de tu página', tipo:'url'},
+      pagina:{boton:'Pon tus redes si no tienes', etiqueta:'Dirección de tu página', tipo:'text'},
       redes :{boton:'Tengo página web',           etiqueta:'Dirección de tus redes', tipo:'text'}
     };
 
@@ -466,7 +727,298 @@
       escribir();
       campo.focus();
     });
+
+    /* ================= ANALISIS PASO A PASO ================= */
+    const PASOS = [
+      {
+        corto:'Impresión',
+        titulo:'Primera impresión',
+        sub:'Lo que entiende alguien en los primeros tres segundos',
+        chequeos:['Leyendo el titular','Buscando qué ofreces','Midiendo cuánto tarda en entenderse'],
+        puntaje:58,
+        hallazgos:[
+          {bien:true,  t:'El logo y el nombre se ven de una', d:'Quien llega sabe en la casa de quién está.'},
+          {bien:false, t:'No se entiende qué vendes', d:'El titular dice "Bienvenidos a nuestra web". Cámbialo por lo que haces y dónde: "Apartamentos en venta y alquiler en Caracas".'},
+          {bien:false, t:'No hay nada que hacer al llegar', d:'Falta un botón grande de WhatsApp arriba del todo. Hoy el visitante tiene que buscarte.'}
+        ]
+      },
+      {
+        corto:'Fotos',
+        titulo:'Las fotos',
+        sub:'Lo primero que mira alguien que busca una propiedad',
+        chequeos:['Contando las fotos','Revisando el tamaño y el peso','Buscando fotos repetidas o de archivo'],
+        puntaje:44,
+        hallazgos:[
+          {bien:true,  t:'Todas las propiedades tienen al menos una foto', d:'Ninguna ficha se ve vacía.'},
+          {bien:false, t:'Catorce fichas tienen una sola foto', d:'Con menos de seis fotos la gente ni entra. Sube fachada, sala, cocina, cuartos, baño y vista.'},
+          {bien:false, t:'Las fotos pesan demasiado', d:'Hay imágenes de más de cuatro megas. En datos móviles la página tarda una eternidad.'}
+        ]
+      },
+      {
+        corto:'Contacto',
+        titulo:'Cómo te contactan',
+        sub:'El camino entre que les gusta algo y que te escriben',
+        chequeos:['Buscando tu WhatsApp','Revisando el formulario','Probando los enlaces'],
+        puntaje:71,
+        hallazgos:[
+          {bien:true,  t:'Tu WhatsApp está y funciona', d:'El enlace abre el chat con mensaje escrito. Eso está bien resuelto.'},
+          {bien:true,  t:'Se ve en todas las páginas', d:'No hay que volver al inicio para encontrarte.'},
+          {bien:false, t:'El formulario pide demasiado', d:'Siete campos obligatorios. Con nombre y teléfono basta, el resto lo preguntas tú después.'}
+        ]
+      },
+      {
+        corto:'Velocidad',
+        titulo:'Qué tan rápido abre',
+        sub:'Cada segundo de más es gente que se va',
+        chequeos:['Cronometrando la carga','Pesando la página','Revisando en datos móviles'],
+        puntaje:52,
+        hallazgos:[
+          {bien:true,  t:'El servidor responde rápido', d:'La primera respuesta llega en menos de medio segundo.'},
+          {bien:false, t:'Tarda 6,4 segundos en verse completa', d:'La mitad de la gente se va antes de los tres segundos. Casi todo el peso son las fotos sin comprimir.'},
+          {bien:false, t:'En teléfono va peor', d:'Con datos móviles pasa de nueve segundos, y ahí es donde te busca la mayoría.'}
+        ]
+      },
+      {
+        corto:'Confianza',
+        titulo:'Si dan ganas de escribirte',
+        sub:'Nadie manda dinero a una página que no sabe de quién es',
+        chequeos:['Buscando quién está detrás','Revisando si hay clientes hablando','Comprobando el candado de seguridad'],
+        puntaje:63,
+        hallazgos:[
+          {bien:true,  t:'La página es segura', d:'Tiene candado, el navegador no asusta a nadie.'},
+          {bien:false, t:'No se sabe quién eres', d:'No hay foto tuya, ni nombre, ni cuántos años llevas. Pon una página de "quién soy" con tu cara.'},
+          {bien:false, t:'Ningún cliente te recomienda ahí', d:'Tienes clientes contentos y no aparecen. Tres frases con nombre y foto cambian todo.'}
+        ]
+      }
+    ];
+
+    const NIVELES = [
+      {min:80, nivel:'Muy bien',    frase:'Esto ya compite. Lo que queda son detalles finos.'},
+      {min:65, nivel:'Va bien',     frase:'La base está. Con dos arreglos das el salto.'},
+      {min:50, nivel:'A medias',    frase:'Funciona, pero estás perdiendo gente por el camino.'},
+      {min:0,  nivel:'Hay trabajo', frase:'Aquí se te está escapando la mayoría. Empieza por esto.'}
+    ];
+
+    const pantallaEntrada = document.getElementById('pantalla-entrada');
+    const pantallaAnalisis = document.getElementById('pantalla-analisis');
+    const elRieles   = document.getElementById('rieles');
+    const elEscaneo  = document.getElementById('escaneo');
+    const elResultado= document.getElementById('resultado');
+    const elHallazgos= document.getElementById('hallazgos');
+    const elTit      = document.getElementById('paso-tit');
+    const elSub      = document.getElementById('paso-sub');
+    const elCifra    = document.getElementById('cifra');
+    const elAro      = document.getElementById('aro-valor');
+    const elNivel    = document.getElementById('nivel');
+    const elFrase    = document.getElementById('frase');
+    const elCuenta   = document.getElementById('cuenta');
+    const elSiguiente= document.getElementById('siguiente');
+    const elDir      = document.getElementById('dir-objetivo');
+    const elEt       = document.getElementById('et-objetivo');
+    const elVolver   = document.getElementById('volver');
+    const CIRCUNF    = 282.7;
+
+    let actual = 0;
+    let relojes = [];
+
+    function limpiarRelojes(){
+      relojes.forEach(clearTimeout);
+      relojes = [];
+    }
+    function esperar(ms, fn){
+      relojes.push(setTimeout(fn, quieto ? 0 : ms));
+    }
+
+    function nivelDe(p){
+      return NIVELES.find(function(n){ return p >= n.min; });
+    }
+
+    function pintarRieles(){
+      elRieles.innerHTML = '';
+      const total = PASOS.length + 1;
+      for(let i = 0; i < total; i++){
+        const riel = document.createElement('div');
+        riel.className = 'riel' + (i < actual ? ' hecho' : '') + (i === actual ? ' actual' : '');
+
+        const punto = document.createElement('span');
+        punto.className = 'punto';
+        if(i < actual){
+          punto.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg>';
+        }else{
+          punto.textContent = i === PASOS.length ? '★' : String(i + 1);
+        }
+        riel.appendChild(punto);
+
+        if(i < total - 1){
+          const linea = document.createElement('span');
+          linea.className = 'linea';
+          riel.appendChild(linea);
+        }
+        elRieles.appendChild(riel);
+      }
+    }
+
+    function contarHasta(destino, ms){
+      const inicio = performance.now();
+      const desde = 0;
+      (function tic(ahora){
+        const t = Math.min(1, (ahora - inicio) / ms);
+        const suave = 1 - Math.pow(1 - t, 3);
+        elCifra.textContent = Math.round(desde + (destino - desde) * suave);
+        if(t < 1) requestAnimationFrame(tic);
+      })(inicio);
+    }
+
+    function mostrarPaso(i){
+      limpiarRelojes();
+      actual = i;
+      pintarRieles();
+
+      if(i === PASOS.length){ mostrarTotal(); return; }
+
+      const paso = PASOS[i];
+      elTit.textContent = paso.titulo;
+      elSub.textContent = paso.sub;
+      elCuenta.textContent = 'Paso ' + (i + 1) + ' de ' + PASOS.length;
+      elSiguiente.textContent = i === PASOS.length - 1 ? 'Ver el total' : 'Siguiente';
+      elSiguiente.disabled = true;
+      elSiguiente.style.opacity = '.45';
+
+      elResultado.classList.remove('viva');
+      elEscaneo.innerHTML = '';
+      elEscaneo.style.display = '';
+
+      paso.chequeos.forEach(function(texto, j){
+        const fila = document.createElement('div');
+        fila.className = 'chequeo';
+        fila.innerHTML = '<span class="aro"></span><span>' + texto + '</span>';
+        elEscaneo.appendChild(fila);
+        esperar(160 + j * 130, function(){ fila.classList.add('viva'); });
+        esperar(620 + j * 460, function(){ fila.classList.add('listo'); });
+      });
+
+      const finEscaneo = 620 + paso.chequeos.length * 460;
+
+      esperar(finEscaneo + 260, function(){
+        elEscaneo.style.display = 'none';
+        elResultado.classList.add('viva');
+
+        const n = nivelDe(paso.puntaje);
+        elNivel.textContent = n.nivel;
+        elFrase.textContent = n.frase;
+
+        elAro.style.transition = 'none';
+        elAro.style.strokeDashoffset = CIRCUNF;
+        elAro.getBoundingClientRect();
+        elAro.style.transition = '';
+        elAro.style.strokeDashoffset = CIRCUNF * (1 - paso.puntaje / 100);
+        contarHasta(paso.puntaje, quieto ? 1 : 1100);
+
+        elHallazgos.innerHTML = '';
+        paso.hallazgos.forEach(function(h, j){
+          const fila = document.createElement('div');
+          fila.className = 'hallazgo' + (h.bien ? ' bien' : '');
+          fila.style.animationDelay = (0.28 + j * 0.11).toFixed(2) + 's';
+          fila.innerHTML =
+            '<span class="senal">' + (h.bien
+              ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.5 5.5L20 6.5"/></svg>'
+              : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v9"/><path d="M12 18.5v.5"/></svg>'
+            ) + '</span>' +
+            '<span class="cuerpo"><span class="t"></span><span class="d"></span></span>';
+          fila.querySelector('.t').textContent = h.t;
+          fila.querySelector('.d').textContent = h.d;
+          elHallazgos.appendChild(fila);
+          requestAnimationFrame(function(){ fila.classList.add('viva'); });
+        });
+
+        elSiguiente.disabled = false;
+        elSiguiente.style.opacity = '1';
+      });
+    }
+
+    function mostrarTotal(){
+      const suma = PASOS.reduce(function(a,p){ return a + p.puntaje; }, 0);
+      const media = Math.round(suma / PASOS.length);
+      const n = nivelDe(media);
+
+      elTit.textContent = 'Tu puntaje';
+      elSub.textContent = 'Lo que te falta, en orden de lo que más te cuesta';
+      elCuenta.textContent = 'Revisamos ' + PASOS.length + ' cosas';
+      elSiguiente.textContent = 'Revisar otra';
+      elSiguiente.disabled = false;
+      elSiguiente.style.opacity = '1';
+
+      elEscaneo.style.display = 'none';
+      elResultado.classList.add('viva');
+      elResultado.querySelector('.marcador').className = 'marcador total';
+      elNivel.textContent = n.nivel;
+      elFrase.textContent = n.frase;
+
+      elAro.style.transition = 'none';
+      elAro.style.strokeDashoffset = CIRCUNF;
+      elAro.getBoundingClientRect();
+      elAro.style.transition = '';
+      elAro.style.strokeDashoffset = CIRCUNF * (1 - media / 100);
+      contarHasta(media, quieto ? 1 : 1300);
+
+      const flojos = PASOS.slice().sort(function(a,b){ return a.puntaje - b.puntaje; });
+      elHallazgos.className = 'lista-arreglos';
+      elHallazgos.innerHTML = '';
+      flojos.forEach(function(p, j){
+        const primero = p.hallazgos.find(function(h){ return !h.bien; });
+        const fila = document.createElement('div');
+        fila.className = 'arreglo';
+        fila.style.animationDelay = (0.3 + j * 0.1).toFixed(2) + 's';
+        fila.innerHTML = '<span class="num">' + (j+1) + '</span><span class="txt"></span><span class="de">' + p.corto + ' · ' + p.puntaje + '</span>';
+        fila.querySelector('.txt').textContent = primero ? primero.t : p.titulo;
+        elHallazgos.appendChild(fila);
+        requestAnimationFrame(function(){ fila.classList.add('viva'); });
+      });
+    }
+
+    function arrancarAnalisis(destino, esRed){
+      elDir.textContent = destino;
+      elEt.textContent = esRed ? 'Revisando tus redes' : 'Revisando tu página';
+      elHallazgos.className = 'hallazgos';
+      const marc = elResultado.querySelector('.marcador') || elResultado.querySelector('.total');
+      if(marc) marc.className = 'marcador';
+
+      pantallaEntrada.classList.add('saliendo');
+      esperar(quieto ? 0 : 420, function(){
+        pantallaEntrada.hidden = true;
+        pantallaEntrada.classList.remove('saliendo');
+        pantallaAnalisis.hidden = false;
+        window.scrollTo(0,0);
+        mostrarPaso(0);
+      });
+    }
+
+    document.getElementById('caja').addEventListener('submit', function(e){
+      e.preventDefault();
+      let valor = campo.value.trim();
+      if(!valor){ campo.focus(); return; }
+      // nadie escribe https://, se lo quitamos de encima
+      valor = valor.replace(/^https?:\/\//i,'').replace(/\/+$/,'');
+      clearTimeout(reloj);
+      arrancarAnalisis(valor, modo === 'redes');
+    });
+
+    elSiguiente.addEventListener('click', function(){
+      if(actual === PASOS.length){ volverAlInicio(); return; }
+      mostrarPaso(actual + 1);
+    });
+
+    function volverAlInicio(){
+      limpiarRelojes();
+      pantallaAnalisis.hidden = true;
+      pantallaEntrada.hidden = false;
+      campo.value = '';
+      escribir();
+      window.scrollTo(0,0);
+    }
+    elVolver.addEventListener('click', volverAlInicio);
   })();
+
   </script>
 
 </body>
