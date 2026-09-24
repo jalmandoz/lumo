@@ -892,68 +892,7 @@
     })();
 
     /* ================= ANALISIS PASO A PASO ================= */
-    const PASOS = [
-      {
-        corto:'Impresión',
-        titulo:'Primera impresión',
-        sub:'Lo que entiende alguien en los primeros tres segundos',
-        chequeos:['Leyendo el titular','Buscando qué ofreces','Midiendo cuánto tarda en entenderse'],
-        puntaje:58,
-        hallazgos:[
-          {bien:true,  t:'El logo y el nombre se ven de una', d:'Quien llega sabe en la casa de quién está.'},
-          {bien:false, t:'No se entiende qué vendes', d:'El titular dice "Bienvenidos a nuestra web". Cámbialo por lo que haces y dónde: "Apartamentos en venta y alquiler en Caracas".'},
-          {bien:false, t:'No hay nada que hacer al llegar', d:'Falta un botón grande de WhatsApp arriba del todo. Hoy el visitante tiene que buscarte.'}
-        ]
-      },
-      {
-        corto:'Fotos',
-        titulo:'Las fotos',
-        sub:'Lo primero que mira alguien que busca una propiedad',
-        chequeos:['Contando las fotos','Revisando el tamaño y el peso','Buscando fotos repetidas o de archivo'],
-        puntaje:44,
-        hallazgos:[
-          {bien:true,  t:'Todas las propiedades tienen al menos una foto', d:'Ninguna ficha se ve vacía.'},
-          {bien:false, t:'Catorce fichas tienen una sola foto', d:'Con menos de seis fotos la gente ni entra. Sube fachada, sala, cocina, cuartos, baño y vista.'},
-          {bien:false, t:'Las fotos pesan demasiado', d:'Hay imágenes de más de cuatro megas. En datos móviles la página tarda una eternidad.'}
-        ]
-      },
-      {
-        corto:'Contacto',
-        titulo:'Cómo te contactan',
-        sub:'El camino entre que les gusta algo y que te escriben',
-        chequeos:['Buscando tu WhatsApp','Revisando el formulario','Probando los enlaces'],
-        puntaje:71,
-        hallazgos:[
-          {bien:true,  t:'Tu WhatsApp está y funciona', d:'El enlace abre el chat con mensaje escrito. Eso está bien resuelto.'},
-          {bien:true,  t:'Se ve en todas las páginas', d:'No hay que volver al inicio para encontrarte.'},
-          {bien:false, t:'El formulario pide demasiado', d:'Siete campos obligatorios. Con nombre y teléfono basta, el resto lo preguntas tú después.'}
-        ]
-      },
-      {
-        corto:'Velocidad',
-        titulo:'Qué tan rápido abre',
-        sub:'Cada segundo de más es gente que se va',
-        chequeos:['Cronometrando la carga','Pesando la página','Revisando en datos móviles'],
-        puntaje:52,
-        hallazgos:[
-          {bien:true,  t:'El servidor responde rápido', d:'La primera respuesta llega en menos de medio segundo.'},
-          {bien:false, t:'Tarda 6,4 segundos en verse completa', d:'La mitad de la gente se va antes de los tres segundos. Casi todo el peso son las fotos sin comprimir.'},
-          {bien:false, t:'En teléfono va peor', d:'Con datos móviles pasa de nueve segundos, y ahí es donde te busca la mayoría.'}
-        ]
-      },
-      {
-        corto:'Confianza',
-        titulo:'Si dan ganas de escribirte',
-        sub:'Nadie manda dinero a una página que no sabe de quién es',
-        chequeos:['Buscando quién está detrás','Revisando si hay clientes hablando','Comprobando el candado de seguridad'],
-        puntaje:63,
-        hallazgos:[
-          {bien:true,  t:'La página es segura', d:'Tiene candado, el navegador no asusta a nadie.'},
-          {bien:false, t:'No se sabe quién eres', d:'No hay foto tuya, ni nombre, ni cuántos años llevas. Pon una página de "quién soy" con tu cara.'},
-          {bien:false, t:'Ningún cliente te recomienda ahí', d:'Tienes clientes contentos y no aparecen. Tres frases con nombre y foto cambian todo.'}
-        ]
-      }
-    ];
+    let PASOS = [];   // lo llena el motor con datos de verdad
 
     const NIVELES = [
       {min:80, nivel:'Muy bien',    frase:'Esto ya compite. Lo que queda son detalles finos.'},
@@ -1124,24 +1063,41 @@
       elAro.style.strokeDashoffset = CIRCUNF * (1 - media / 100);
       contarHasta(media, quieto ? 1 : 1300);
 
-      const flojos = PASOS.slice().sort(function(a,b){ return a.puntaje - b.puntaje; });
+      // solo entran las areas que de verdad tienen algo que arreglar
+      const flojos = PASOS
+        .map(function(p){ return { p:p, falla:p.hallazgos.find(function(h){ return !h.bien; }) }; })
+        .filter(function(x){ return !!x.falla; })
+        .sort(function(a,b){ return a.p.puntaje - b.p.puntaje; });
+
       elHallazgos.className = 'lista-arreglos';
       elHallazgos.innerHTML = '';
-      flojos.forEach(function(p, j){
-        const primero = p.hallazgos.find(function(h){ return !h.bien; });
+
+      if(!flojos.length){
+        const fila = document.createElement('div');
+        fila.className = 'arreglo viva';
+        fila.innerHTML = '<span class="num">✓</span><span class="txt">No encontramos nada que arreglar</span>';
+        elHallazgos.appendChild(fila);
+        elSub.textContent = 'Revisamos todo y está en orden';
+        return;
+      }
+
+      elSub.textContent = 'Lo que te falta, en orden de lo que más te cuesta';
+      flojos.forEach(function(x, j){
         const fila = document.createElement('div');
         fila.className = 'arreglo';
         fila.style.animationDelay = (0.3 + j * 0.1).toFixed(2) + 's';
-        fila.innerHTML = '<span class="num">' + (j+1) + '</span><span class="txt"></span><span class="de">' + p.corto + ' · ' + p.puntaje + '</span>';
-        fila.querySelector('.txt').textContent = primero ? primero.t : p.titulo;
+        fila.innerHTML = '<span class="num">' + (j+1) + '</span><span class="txt"></span><span class="de">' + x.p.corto + ' · ' + x.p.puntaje + '</span>';
+        fila.querySelector('.txt').textContent = x.falla.t;
         elHallazgos.appendChild(fila);
         requestAnimationFrame(function(){ fila.classList.add('viva'); });
       });
     }
 
-    function arrancarAnalisis(destino, esRed){
+    const elAviso = document.querySelector('.aviso');
+
+    async function arrancarAnalisis(destino){
       elDir.textContent = destino;
-      elEt.textContent = esRed ? 'Revisando tus redes' : 'Revisando tu página';
+      elEt.textContent = 'Revisando';
       elHallazgos.className = 'hallazgos';
       const marc = elResultado.querySelector('.marcador') || elResultado.querySelector('.total');
       if(marc) marc.className = 'marcador';
@@ -1152,8 +1108,60 @@
         pantallaEntrada.classList.remove('saliendo');
         pantallaAnalisis.hidden = false;
         window.scrollTo(0,0);
-        mostrarPaso(0);
+        esperando();
       });
+
+      // el motor trabaja mientras el usuario ve el escaneo
+      try{
+        const r = await fetch('/api/analizar?destino=' + encodeURIComponent(destino));
+        const datos = await r.json();
+        if(!r.ok) throw new Error(datos.error || 'No pudimos revisar eso.');
+
+        PASOS = datos.pasos;
+        elDir.textContent = datos.destino;
+        elEt.textContent = datos.tipo === 'web' ? 'Revisando tu página' : 'Revisando tus redes';
+        elAviso.textContent = 'Revisado en vivo, ' + (datos.ms/1000).toFixed(1).replace('.',',') + ' segundos. Los puntajes salen de tu ' + (datos.tipo === 'web' ? 'página' : 'perfil') + ', no de un ejemplo.';
+        mostrarPaso(0);
+      }catch(e){
+        fallo(e.message);
+      }
+    }
+
+    // mientras el motor trabaja
+    function esperando(){
+      limpiarRelojes();
+      elRieles.innerHTML = '';
+      elTit.textContent = 'Entrando a mirar';
+      elSub.textContent = 'Estamos abriendo tu página igual que lo haría un cliente';
+      elCuenta.textContent = '';
+      elSiguiente.disabled = true;
+      elSiguiente.style.opacity = '.45';
+      elResultado.classList.remove('viva');
+      elEscaneo.style.display = '';
+      elEscaneo.innerHTML = '';
+
+      ['Abriendo la dirección','Descargando lo que hay dentro','Midiendo cada cosa'].forEach(function(t,j){
+        const fila = document.createElement('div');
+        fila.className = 'chequeo';
+        fila.innerHTML = '<span class="aro"></span><span>' + t + '</span>';
+        elEscaneo.appendChild(fila);
+        esperar(140 + j*150, function(){ fila.classList.add('viva'); });
+      });
+    }
+
+    function fallo(mensaje){
+      limpiarRelojes();
+      elRieles.innerHTML = '';
+      elEscaneo.style.display = 'none';
+      elResultado.classList.remove('viva');
+      elTit.textContent = 'No pudimos revisarlo';
+      elSub.textContent = mensaje;
+      elCuenta.textContent = '';
+      elAviso.textContent = '';
+      elSiguiente.textContent = 'Probar con otra';
+      elSiguiente.disabled = false;
+      elSiguiente.style.opacity = '1';
+      actual = -1;
     }
 
     document.getElementById('caja').addEventListener('submit', function(e){
@@ -1163,11 +1171,11 @@
       // nadie escribe https://, se lo quitamos de encima
       valor = valor.replace(/^https?:\/\//i,'').replace(/\/+$/,'');
       clearTimeout(reloj);
-      arrancarAnalisis(valor, modo === 'redes');
+      arrancarAnalisis(valor);
     });
 
     elSiguiente.addEventListener('click', function(){
-      if(actual === PASOS.length){ volverAlInicio(); return; }
+      if(actual === -1 || actual === PASOS.length){ volverAlInicio(); return; }
       mostrarPaso(actual + 1);
     });
 

@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "lumo",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "4321"],
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["servidor.js"],
       "port": 4321
     }
   ]
