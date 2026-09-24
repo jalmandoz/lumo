@@ -287,6 +287,140 @@
     }
 
 
+
+    /* ================= PANTALLA DE CARGA ================= */
+    body.cargando{overflow:hidden;}
+    body.cargando .pantalla{visibility:hidden;}
+    /* las animaciones de la bienvenida esperan a que termine la carga */
+    body.cargando .letra,
+    body.cargando .logo,
+    body.cargando .acciones{animation-play-state:paused;}
+
+    .cargador{
+      position:fixed;inset:0;z-index:50;
+      display:flex;align-items:center;justify-content:center;
+      padding:32px;
+      transition:opacity .75s var(--curva-suave), transform .75s var(--curva);
+    }
+    .cargador.fuera{
+      opacity:0;
+      transform:scale(1.04);
+      pointer-events:none;
+    }
+
+    .cargador-caja{
+      display:flex;flex-direction:column;align-items:center;
+      width:min(400px,76vw);
+      animation:llegar-carga .8s var(--curva) both;
+    }
+    @keyframes llegar-carga{
+      from{opacity:0;transform:translateY(18px) scale(.96);}
+      to  {opacity:1;transform:none;}
+    }
+
+    /* el logo respirando mientras carga */
+    .logo-carga{
+      font-family:var(--fuente-marca);
+      font-weight:800;
+      font-size:clamp(3rem,12vw,5.2rem);
+      letter-spacing:-.05em;
+      line-height:1;
+      color:var(--vino);
+      margin-bottom:38px;
+      will-change:transform;
+      animation:latido 3.4s ease-in-out infinite;
+    }
+    @keyframes latido{
+      0%,100%{transform:scale(1);}
+      50%    {transform:scale(1.035);}
+    }
+    @supports (-webkit-background-clip:text) or (background-clip:text){
+      .logo-carga{
+        background-image:linear-gradient(90deg,
+          var(--rosa)        0%,
+          var(--vino)       17%,
+          var(--vino-hondo) 36%,
+          var(--negro)      50%,
+          var(--rosa)       72%,
+          var(--vino)      100%);
+        background-size:240% 100%;
+        -webkit-background-clip:text;
+        background-clip:text;
+        color:transparent;
+        animation:barrer 2.6s linear infinite, latido 3.4s ease-in-out infinite;
+      }
+    }
+    @keyframes barrer{
+      from{background-position:100% 0;}
+      to  {background-position:-40% 0;}
+    }
+
+    /* la barra */
+    .barra{
+      width:100%;height:9px;
+      border-radius:6px;
+      background:#F2E8EC;
+      overflow:hidden;
+      position:relative;
+    }
+    .relleno{
+      display:block;height:100%;width:0;
+      border-radius:6px;
+      background:linear-gradient(90deg,#D94E7E,var(--rosa),var(--vino),var(--vino-hondo));
+      background-size:220% 100%;
+      position:relative;
+      overflow:hidden;
+      box-shadow:0 0 20px -4px rgba(178,26,82,.75);
+      animation:llenar 5s linear forwards, correr-color 2.4s linear infinite;
+    }
+    /* el destello que recorre lo ya cargado */
+    .relleno::after{
+      content:"";
+      position:absolute;top:0;bottom:0;width:45%;
+      background:linear-gradient(100deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,.55) 50%,
+        rgba(255,255,255,0) 100%);
+      animation:destello 1.5s var(--curva-suave) infinite;
+    }
+    @keyframes llenar{
+      0%  {width:0;}
+      10% {width:19%;}
+      22% {width:28%;}
+      38% {width:53%;}
+      52% {width:61%;}
+      68% {width:79%;}
+      84% {width:89%;}
+      94% {width:96%;}
+      100%{width:100%;}
+    }
+    @keyframes correr-color{
+      from{background-position:0% 0;}
+      to  {background-position:-220% 0;}
+    }
+    @keyframes destello{
+      from{left:-50%;}
+      to  {left:110%;}
+    }
+
+    .cargando-txt{
+      margin-top:18px;
+      font-size:.95rem;
+      font-weight:600;
+      color:var(--apagado);
+      letter-spacing:.01em;
+      align-self:flex-start;
+    }
+    .puntos i{font-style:normal;opacity:0;animation:puntear 1.4s infinite;}
+    .puntos i:nth-child(2){animation-delay:.18s;}
+    .puntos i:nth-child(3){animation-delay:.36s;}
+    @keyframes puntear{
+      0%  {opacity:0;}
+      22% {opacity:1;}
+      72% {opacity:1;}
+      100%{opacity:0;}
+    }
+
     /* ================= ANALISIS PASO A PASO ================= */
     .pantalla{position:relative;z-index:2;}
     .pantalla[hidden]{display:none !important;}
@@ -493,12 +627,22 @@
     @media (prefers-reduced-motion:reduce){
       *,*::before,*::after{animation:none !important;transition:none !important;}
       .letra,.logo,.acciones,.hallazgo,.arreglo,.chequeo{opacity:1;transform:none;filter:none;}
+      .relleno{animation:llenar .7s linear forwards !important;}
+      .logo-carga{background-position:0 0;}
       .logo{background-position:0 0;}
       .foco{display:none;}
     }
   </style>
 </head>
-<body>
+<body class="cargando">
+
+  <div class="cargador" id="cargador" role="status" aria-live="polite" aria-label="Cargando">
+    <div class="cargador-caja">
+      <span class="logo-carga">lumo</span>
+      <div class="barra"><span class="relleno"></span></div>
+      <span class="cargando-txt">cargando<span class="puntos"><i>.</i><i>.</i><i>.</i></span></span>
+    </div>
+  </div>
 
   <div class="ambiente" aria-hidden="true">
     <span class="mancha m1"></span>
@@ -727,6 +871,20 @@
       escribir();
       campo.focus();
     });
+
+
+    /* ---------- la carga: cinco segundos y adentro ---------- */
+    (function(){
+      const cargador = document.getElementById('cargador');
+      const espera = quieto ? 700 : 5000;
+
+      setTimeout(function(){
+        cargador.classList.add('fuera');
+        document.body.classList.remove('cargando');
+        cargador.setAttribute('aria-hidden','true');
+        setTimeout(function(){ cargador.remove(); }, 800);
+      }, espera);
+    })();
 
     /* ================= ANALISIS PASO A PASO ================= */
     const PASOS = [
