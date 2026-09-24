@@ -5,93 +5,169 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lumo</title>
 
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Unbounded:wght@800&display=swap">
+  <!-- Satoshi: la misma familia que usa Propiedash -->
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@800&display=swap">
 
   <style>
     /* ---------- tokens ---------- */
     :root{
       --blanco:#FFFFFF;
-      --texto:#1A0710;
+      --texto:#12040A;
       --apagado:#6E5A63;
-      --linea:rgba(11,0,5,.16);
-      --linea-fuerte:rgba(11,0,5,.30);
+      --linea:rgba(11,0,5,.14);
+      --linea-fuerte:rgba(11,0,5,.34);
 
       --rosa:#B21A52;
       --vino:#70012B;
       --vino-hondo:#25000E;
       --negro:#000000;
 
-      /* la marca nunca cambia de tipo */
       --fuente-marca:'Unbounded', sans-serif;
-      /* el titular: cambia esta linea para probar otra voz */
-      --fuente-titular:'Instrument Serif', Georgia, serif;
-      --fuente-texto:'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --fuente:'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-      --curva:cubic-bezier(.2,.7,.2,1);
+      --curva:cubic-bezier(.16,.84,.26,1);
+      --curva-suave:cubic-bezier(.4,0,.2,1);
     }
 
-    /* ---------- base ---------- */
     *{box-sizing:border-box;}
     html,body{margin:0;padding:0;}
     body{
       background:var(--blanco);
       color:var(--texto);
-      font-family:var(--fuente-texto);
+      font-family:var(--fuente);
       font-size:16px;
-      line-height:1.6;
+      line-height:1.55;
       -webkit-font-smoothing:antialiased;
+      overflow-x:hidden;
     }
 
-    .contenedor{
-      width:100%;
-      max-width:780px;
-      margin:0 auto;
-      padding:0 32px;
+    /* ---------- luz de fondo ---------- */
+    .ambiente{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      overflow:hidden;
     }
-    @media (max-width:640px){
-      .contenedor{padding:0 22px;}
+    .mancha{
+      position:absolute;
+      border-radius:50%;
+      filter:blur(90px);
+      opacity:.30;
+      will-change:transform;
     }
+    .m1{
+      width:52vw;height:52vw;
+      background:radial-gradient(circle at 40% 40%, #B21A52, rgba(178,26,82,0) 70%);
+      top:-14vw;left:-10vw;
+      animation:vagar-1 26s ease-in-out infinite;
+    }
+    .m2{
+      width:46vw;height:46vw;
+      background:radial-gradient(circle at 60% 50%, #70012B, rgba(112,1,43,0) 70%);
+      bottom:-18vw;right:-8vw;
+      animation:vagar-2 32s ease-in-out infinite;
+    }
+    .m3{
+      width:34vw;height:34vw;
+      background:radial-gradient(circle at 50% 50%, #E0648F, rgba(224,100,143,0) 70%);
+      top:40%;left:52%;
+      opacity:.22;
+      animation:vagar-3 22s ease-in-out infinite;
+    }
+    @keyframes vagar-1{
+      0%,100%{transform:translate3d(0,0,0) scale(1);}
+      50%    {transform:translate3d(9vw,7vh,0) scale(1.14);}
+    }
+    @keyframes vagar-2{
+      0%,100%{transform:translate3d(0,0,0) scale(1.06);}
+      50%    {transform:translate3d(-11vw,-8vh,0) scale(.92);}
+    }
+    @keyframes vagar-3{
+      0%,100%{transform:translate3d(0,0,0) scale(.9);}
+      50%    {transform:translate3d(-7vw,9vh,0) scale(1.2);}
+    }
+
+    /* el foco que sigue al raton: la marca se llama Lumo por algo */
+    .foco{
+      position:fixed;
+      top:0;left:0;
+      width:640px;height:640px;
+      margin:-320px 0 0 -320px;
+      z-index:1;
+      pointer-events:none;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(178,26,82,.16) 0%, rgba(178,26,82,.06) 38%, rgba(178,26,82,0) 66%);
+      opacity:0;
+      transition:opacity .6s var(--curva-suave);
+      will-change:transform;
+    }
+    .foco.visible{opacity:1;}
 
     /* ---------- entrada ---------- */
     .entrada{
+      position:relative;
+      z-index:2;
       min-height:100svh;
       display:flex;
       align-items:center;
-      padding:80px 0;
+      justify-content:center;
+      padding:80px 32px;
     }
     .bloque{
+      width:100%;
+      max-width:880px;
       display:flex;
       flex-direction:column;
-      align-items:flex-start;
-      gap:10px;
+      align-items:center;
+      text-align:center;
     }
 
     /* ---------- titular ---------- */
     .saludo{
-      font-family:var(--fuente-titular);
-      font-weight:400;
-      font-size:clamp(2.4rem,7vw,4.4rem);
-      line-height:1.04;
-      letter-spacing:-.015em;
+      font-family:var(--fuente);
+      font-weight:900;
+      font-size:clamp(2.7rem,8.2vw,5.6rem);
+      line-height:1.0;
+      letter-spacing:-.045em;
       margin:0;
       color:var(--texto);
       text-wrap:balance;
+    }
+    .letra{
+      display:inline-block;
+      opacity:0;
+      transform:translateY(26px) scale(.94);
+      filter:blur(9px);
+      animation:asomar .82s var(--curva) forwards;
+    }
+    .hueco{display:inline-block;}
+    @keyframes asomar{
+      to{opacity:1;transform:translateY(0) scale(1);filter:blur(0);}
     }
 
     /* la palabra lumo es la marca */
     .logo{
       font-family:var(--fuente-marca);
       font-weight:800;
-      font-size:.78em;
-      letter-spacing:-.045em;
-      color:var(--vino);
+      font-size:.84em;
+      letter-spacing:-.05em;
       display:inline-block;
+      color:var(--vino);
+      opacity:0;
+      transform:translateY(26px) scale(.9);
+      animation:asomar-marca .95s var(--curva) forwards;
+    }
+    @keyframes asomar-marca{
+      to{opacity:1;transform:translateY(0) scale(1);}
     }
     @supports (-webkit-background-clip:text) or (background-clip:text){
       .logo{
-        /* la mitad izquierda de esta rampa es el logo tal cual quedo aprobado */
+        /* la mitad izquierda de la rampa es el logo tal cual quedo aprobado */
         background-image:linear-gradient(90deg,
           var(--rosa)        0%,
           var(--vino)       17%,
@@ -103,8 +179,9 @@
         -webkit-background-clip:text;
         background-clip:text;
         color:transparent;
-        animation:rasante 1.5s var(--curva) .35s forwards,
-                  respirar 14s ease-in-out 1.9s infinite;
+        animation:asomar-marca .95s var(--curva) forwards,
+                  rasante 1.6s var(--curva) .55s forwards,
+                  respirar 9s ease-in-out 2.3s infinite;
       }
     }
     @keyframes rasante{
@@ -113,223 +190,300 @@
     }
     @keyframes respirar{
       0%,100%{background-position:0% 0;}
-      50%    {background-position:9% 0;}
+      50%    {background-position:16% 0;}
     }
 
     .pregunta{
-      font-size:1.16rem;
+      font-size:clamp(1.05rem,2.2vw,1.3rem);
+      font-weight:500;
       color:var(--apagado);
-      margin:6px 0 20px;
+      margin:18px 0 32px;
+      opacity:0;
+      transform:translateY(14px);
+      animation:asomar-suave .8s var(--curva) .62s forwards;
+    }
+    @keyframes asomar-suave{
+      to{opacity:1;transform:translateY(0);}
     }
 
-    /* ---------- fila de acciones ---------- */
+    /* ---------- acciones ---------- */
     .acciones{
       display:flex;
       align-items:stretch;
-      gap:14px;
-      flex-wrap:wrap;
+      gap:12px;
       width:100%;
+      max-width:680px;
+      opacity:0;
+      transform:translateY(18px);
+      animation:asomar-suave .85s var(--curva) .78s forwards;
     }
 
-    /* boton con relleno que entra desde la izquierda */
     .boton{
       position:relative;
       isolation:isolate;
       overflow:hidden;
-      font-family:var(--fuente-texto);
+      font-family:var(--fuente);
       font-size:1rem;
-      font-weight:600;
+      font-weight:700;
       color:var(--blanco);
       background:var(--vino);
       border:1.5px solid var(--vino);
-      height:62px;
-      padding:0 30px;
+      border-radius:2px;
+      height:64px;
+      padding:0 28px;
       cursor:pointer;
       white-space:nowrap;
-      transition:color .3s var(--curva), border-color .3s var(--curva);
+      will-change:transform;
+      transition:color .32s var(--curva-suave),
+                 border-color .32s var(--curva-suave),
+                 transform .5s var(--curva);
     }
     .boton::before{
       content:"";
-      position:absolute;
-      inset:0;
-      z-index:-1;
-      background:var(--rosa);
-      transform:scaleX(0);
-      transform-origin:left center;
-      transition:transform .42s var(--curva);
+      position:absolute;inset:0;z-index:-1;
+      background:linear-gradient(100deg,var(--rosa),#D94E7E);
+      transform:translateY(101%);
+      transition:transform .46s var(--curva);
     }
-    .boton:hover::before{transform:scaleX(1);}
-    .boton:focus-visible{outline:2px solid var(--vino);outline-offset:3px;}
-
+    .boton:hover::before{transform:translateY(0);}
+    .boton:focus-visible{outline:2px solid var(--vino);outline-offset:4px;}
     .boton[aria-pressed="true"]{
       background:var(--blanco);
       color:var(--vino);
       border-color:var(--linea-fuerte);
     }
-    .boton[aria-pressed="true"]:hover{
-      color:var(--blanco);
-      border-color:var(--rosa);
-    }
+    .boton[aria-pressed="true"]:hover{color:var(--blanco);border-color:var(--rosa);}
 
-    /* caja */
     .caja{
       position:relative;
       flex:1;
-      min-width:290px;
+      min-width:0;
       display:flex;
       align-items:center;
-      height:62px;
-      background:var(--blanco);
+      height:64px;
+      background:rgba(255,255,255,.72);
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
       border:1.5px solid var(--linea);
-      transition:border-color .3s var(--curva);
+      border-radius:2px;
+      transition:border-color .32s var(--curva-suave), box-shadow .4s var(--curva-suave);
     }
-    .caja::after{
-      content:"";
-      position:absolute;
-      left:0;right:0;bottom:-1.5px;
-      height:2px;
-      background:linear-gradient(90deg,var(--rosa),var(--vino-hondo));
-      transform:scaleX(0);
-      transform-origin:left center;
-      transition:transform .42s var(--curva);
+    .caja:focus-within{
+      border-color:transparent;
+      box-shadow:0 0 0 1.5px var(--vino), 0 12px 34px -14px rgba(112,1,43,.45);
     }
-    .caja:focus-within{border-color:var(--linea-fuerte);}
-    .caja:focus-within::after{transform:scaleX(1);}
-
     .caja input{
-      flex:1;
-      min-width:0;
-      height:100%;
-      border:none;
-      outline:none;
-      background:transparent;
-      padding:0 18px;
-      font-family:var(--fuente-texto);
-      font-size:1rem;
+      flex:1;min-width:0;height:100%;
+      border:none;outline:none;background:transparent;
+      padding:0 20px;
+      font-family:var(--fuente);
+      font-size:1.02rem;
+      font-weight:500;
       color:var(--texto);
     }
-    .caja input::placeholder{
-      color:var(--apagado);
-      transition:opacity .22s var(--curva);
+    .caja input::placeholder{color:var(--apagado);opacity:.85;}
+
+    .cursor{
+      display:inline-block;
+      width:1.5px;height:1.05em;
+      background:var(--vino);
+      vertical-align:-.16em;
+      animation:latir 1.05s steps(2,start) infinite;
     }
-    .caja input:focus::placeholder{opacity:.45;}
+    @keyframes latir{0%,100%{opacity:1;}50%{opacity:0;}}
 
     .enviar{
-      height:100%;
-      width:60px;
-      flex:0 0 auto;
-      border:none;
-      background:transparent;
-      color:var(--vino);
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      transition:background .3s var(--curva), color .3s var(--curva);
+      height:100%;width:62px;flex:0 0 auto;
+      border:none;background:transparent;
+      color:var(--vino);cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:background .32s var(--curva-suave), color .32s var(--curva-suave);
     }
     .enviar:hover{background:var(--vino);color:var(--blanco);}
     .enviar:focus-visible{outline:2px solid var(--vino);outline-offset:-4px;}
     .enviar svg{
       width:21px;height:21px;display:block;
-      transition:transform .34s var(--curva);
+      transition:transform .38s var(--curva);
     }
-    .enviar:hover svg{transform:translateX(3px);}
+    .enviar:hover svg{transform:translateX(4px);}
 
-    /* ---------- entrada escalonada ---------- */
-    .sube{
-      opacity:0;
-      transform:translateY(16px);
-      animation:subir .78s var(--curva) forwards;
-    }
-    .sube-1{animation-delay:.05s;}
-    .sube-2{animation-delay:.20s;}
-    .sube-3{animation-delay:.32s;}
-    @keyframes subir{
-      to{opacity:1;transform:translateY(0);}
-    }
-
-    @media (max-width:560px){
-      .acciones{flex-direction:column;}
+    @media (max-width:620px){
+      .acciones{flex-direction:column-reverse;}
       .boton{width:100%;}
-      .caja{width:100%;min-width:0;}
     }
 
     @media (prefers-reduced-motion:reduce){
-      *,*::before,*::after{
-        animation:none !important;
-        transition:none !important;
-      }
-      .sube{opacity:1;transform:none;}
-      .logo{background-position:0% 0;}
+      *,*::before,*::after{animation:none !important;transition:none !important;}
+      .letra,.logo,.pregunta,.acciones{opacity:1;transform:none;filter:none;}
+      .logo{background-position:0 0;}
+      .foco{display:none;}
     }
   </style>
 </head>
 <body>
 
-  <main class="entrada">
-    <div class="contenedor bloque">
+  <div class="ambiente" aria-hidden="true">
+    <span class="mancha m1"></span>
+    <span class="mancha m2"></span>
+    <span class="mancha m3"></span>
+  </div>
+  <div class="foco" id="foco" aria-hidden="true"></div>
 
-      <h1 class="saludo sube sube-1">
+  <main class="entrada">
+    <div class="bloque">
+
+      <h1 class="saludo" id="saludo" data-texto="Bienvenid@ a">
         Bienvenid@ a <span class="logo">lumo</span>
       </h1>
 
-      <p class="pregunta sube sube-2">¿Ya tienes página web?</p>
+      <p class="pregunta">¿Ya tienes página web?</p>
 
-      <div class="acciones sube sube-3">
-
+      <div class="acciones">
         <button class="boton" id="redes" type="button" aria-pressed="false">Pon tus redes si no tienes</button>
 
-        <form class="caja" action="#" method="get">
+        <form class="caja" id="caja" action="#" method="get">
           <label for="url" hidden>Dirección de tu página</label>
-          <input id="url" name="url" type="url" inputmode="url" placeholder="pega aquí tu página" autocomplete="url">
+          <input id="url" name="url" type="url" inputmode="url" autocomplete="url" placeholder="">
           <button class="enviar" type="submit" aria-label="Calificar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" aria-hidden="true">
-              <path d="M4 12h15"/>
-              <path d="M13 6l6 6-6 6"/>
+              <path d="M4 12h15"/><path d="M13 6l6 6-6 6"/>
             </svg>
           </button>
         </form>
-
       </div>
 
     </div>
   </main>
 
   <script>
-    // El boton alterna la caja entre pagina web y redes sociales
-    (function(){
-      const boton = document.getElementById('redes');
-      const campo = document.getElementById('url');
-      const etiqueta = document.querySelector('label[for="url"]');
+  (function(){
+    const quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      const modos = {
-        pagina:{
-          texto:'Pon tus redes si no tienes',
-          marcador:'pega aquí tu página',
-          tipo:'url',
-          etiqueta:'Dirección de tu página'
-        },
-        redes:{
-          texto:'Tengo página web',
-          marcador:'pega aquí tu Instagram, Facebook o TikTok',
-          tipo:'text',
-          etiqueta:'Dirección de tus redes'
+    /* ---------- el titular entra letra por letra ---------- */
+    const saludo = document.getElementById('saludo');
+    const marca  = saludo.querySelector('.logo');
+    const texto  = saludo.dataset.texto;
+
+    if(!quieto){
+      const trozos = document.createDocumentFragment();
+      [...texto].forEach(function(caracter, i){
+        const span = document.createElement('span');
+        if(caracter === ' '){
+          span.className = 'hueco';
+          span.innerHTML = '&nbsp;';
+        }else{
+          span.className = 'letra';
+          span.textContent = caracter;
+          span.style.animationDelay = (0.04 + i * 0.032).toFixed(3) + 's';
         }
-      };
-
-      boton.addEventListener('click', function(){
-        const enRedes = boton.getAttribute('aria-pressed') === 'true';
-        const modo = enRedes ? modos.pagina : modos.redes;
-
-        boton.setAttribute('aria-pressed', String(!enRedes));
-        boton.textContent = modo.texto;
-        campo.type = modo.tipo;
-        campo.placeholder = modo.marcador;
-        etiqueta.textContent = modo.etiqueta;
-        campo.value = '';
-        campo.focus();
+        trozos.appendChild(span);
       });
-    })();
+      trozos.appendChild(document.createTextNode(' '));
+      saludo.textContent = '';
+      saludo.appendChild(trozos);
+      saludo.appendChild(marca);
+      marca.style.animationDelay = (0.04 + texto.length * 0.032).toFixed(3) + 's, ' +
+                                   (0.55 + texto.length * 0.032).toFixed(3) + 's, ' +
+                                   (2.3 + texto.length * 0.032).toFixed(3) + 's';
+    }
+
+    /* ---------- el foco sigue al raton con retraso ---------- */
+    const foco = document.getElementById('foco');
+    if(!quieto && window.matchMedia('(pointer:fine)').matches){
+      let destinoX = innerWidth/2, destinoY = innerHeight/2;
+      let x = destinoX, y = destinoY;
+
+      addEventListener('mousemove', function(e){
+        destinoX = e.clientX;
+        destinoY = e.clientY;
+        foco.classList.add('visible');
+      }, {passive:true});
+
+      (function seguir(){
+        x += (destinoX - x) * 0.09;
+        y += (destinoY - y) * 0.09;
+        foco.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0)';
+        requestAnimationFrame(seguir);
+      })();
+    }
+
+    /* ---------- el boton se imanta al cursor ---------- */
+    const boton = document.getElementById('redes');
+    if(!quieto && window.matchMedia('(pointer:fine)').matches){
+      boton.addEventListener('mousemove', function(e){
+        const caja = boton.getBoundingClientRect();
+        const dx = (e.clientX - (caja.left + caja.width/2)) / caja.width;
+        const dy = (e.clientY - (caja.top + caja.height/2)) / caja.height;
+        boton.style.transform = 'translate(' + (dx*9).toFixed(1) + 'px,' + (dy*6).toFixed(1) + 'px)';
+      });
+      boton.addEventListener('mouseleave', function(){
+        boton.style.transform = 'translate(0,0)';
+      });
+    }
+
+    /* ---------- el marcador se escribe solo ---------- */
+    const campo = document.getElementById('url');
+    const etiqueta = document.querySelector('label[for="url"]');
+
+    const ejemplos = {
+      pagina:['tuinmobiliaria.com','midominio.com.ve','www.tunegocio.com'],
+      redes :['instagram.com/tunegocio','facebook.com/tunegocio','tiktok.com/@tunegocio']
+    };
+    const prefijo = {pagina:'pega aquí tu página  ', redes:'pega aquí tus redes  '};
+
+    let modo = 'pagina';
+    let reloj = null;
+
+    function escribir(){
+      if(quieto){
+        campo.placeholder = prefijo[modo].trim();
+        return;
+      }
+      clearTimeout(reloj);
+      let i = 0, j = 0, borrando = false;
+
+      (function paso(){
+        const lista = ejemplos[modo];
+        const palabra = lista[i % lista.length];
+        j = borrando ? j - 1 : j + 1;
+        campo.placeholder = prefijo[modo] + palabra.slice(0, j);
+
+        let espera = borrando ? 34 : 62;
+        if(!borrando && j === palabra.length){ borrando = true; espera = 1700; }
+        else if(borrando && j === 0){ borrando = false; i++; espera = 320; }
+
+        reloj = setTimeout(paso, espera);
+      })();
+    }
+    escribir();
+
+    campo.addEventListener('focus', function(){
+      clearTimeout(reloj);
+      campo.placeholder = prefijo[modo].trim();
+    });
+    campo.addEventListener('blur', function(){
+      if(!campo.value) escribir();
+    });
+
+    /* ---------- el boton alterna entre pagina y redes ---------- */
+    const textos = {
+      pagina:{boton:'Pon tus redes si no tienes', etiqueta:'Dirección de tu página', tipo:'url'},
+      redes :{boton:'Tengo página web',           etiqueta:'Dirección de tus redes', tipo:'text'}
+    };
+
+    boton.addEventListener('click', function(){
+      modo = modo === 'pagina' ? 'redes' : 'pagina';
+      const t = textos[modo];
+
+      boton.setAttribute('aria-pressed', String(modo === 'redes'));
+      boton.textContent = t.boton;
+      etiqueta.textContent = t.etiqueta;
+      campo.type = t.tipo;
+      campo.value = '';
+      escribir();
+      campo.focus();
+    });
+  })();
   </script>
 
 </body>
