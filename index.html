@@ -1120,7 +1120,15 @@
         PASOS = datos.pasos;
         elDir.textContent = datos.destino;
         elEt.textContent = datos.tipo === 'web' ? 'Revisando tu página' : 'Revisando tus redes';
-        elAviso.textContent = 'Revisado en vivo, ' + (datos.ms/1000).toFixed(1).replace('.',',') + ' segundos. Los puntajes salen de tu ' + (datos.tipo === 'web' ? 'página' : 'perfil') + ', no de un ejemplo.';
+        const segundos = (datos.ms/1000).toFixed(1).replace('.',',');
+        let nota = 'Revisado en vivo en ' + segundos + ' segundos. Los puntajes salen de tu ' + (datos.tipo === 'web' ? 'página' : 'perfil') + '.';
+        if(datos.motor){
+          const extras = [];
+          if(datos.motor.velocidad === 'google') extras.push('la velocidad la midió Google');
+          if(datos.motor.impresion === 'claude') extras.push('la primera impresión la juzgó Claude');
+          if(extras.length) nota += ' Aquí ' + extras.join(' y ') + '.';
+        }
+        elAviso.textContent = nota;
         mostrarPaso(0);
       }catch(e){
         fallo(e.message);

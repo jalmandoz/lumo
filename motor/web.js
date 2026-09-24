@@ -1,5 +1,7 @@
 // Analiza una pagina web de verdad: la descarga y la mide.
 const U = require('./util');
+const { velocidadDeGoogle } = require('./velocidad');
+const { juicioDeClaude } = require('./juicio');
 
 const PALABRAS_RUBRO = /(inmobiliari|propiedad|apartament|casa|terreno|local|oficina|alquiler|arriendo|venta|vender|comprar|bienes ra[ií]ces|realty|realtor|corredor)/i;
 const PALABRAS_LUGAR = /(caracas|valencia|maracaibo|barquisimeto|maracay|m[eé]rida|puerto la cruz|margarita|barcelona|maturin|lechería|venezuela|miranda|zulia|carabobo|anzo[aá]tegui|aragua|lara)/i;
@@ -260,7 +262,32 @@ async function analizarWeb(destino) {
     }
   ];
 
-  return { tipo: 'web', destino: r.url.replace(/^https?:\/\//, '').replace(/\/$/, ''), pasos };
+  // Si hay claves puestas, dos pasos se reemplazan por la version buena.
+  // Google mide la velocidad de verdad y Claude juzga si la pagina se entiende.
+  const [deGoogle, deClaude] = await Promise.all([
+    velocidadDeGoogle(r.url),
+    juicioDeClaude({
+      url: r.url,
+      titulo: tituloLimpio,
+      descripcion,
+      h1,
+      ctaArriba,
+      texto: texto.slice(0, 7000)
+    })
+  ]);
+
+  if (deClaude) pasos[0] = deClaude;
+  if (deGoogle) pasos[3] = deGoogle;
+
+  return {
+    tipo: 'web',
+    destino: r.url.replace(/^https?:\/\//, '').replace(/\/$/, ''),
+    pasos,
+    motor: {
+      impresion: deClaude ? 'claude' : 'reglas',
+      velocidad: deGoogle ? 'google' : 'medicion propia'
+    }
+  };
 }
 
 module.exports = { analizarWeb };

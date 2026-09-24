@@ -1,0 +1,14 @@
+{
+  "name": "lumo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Califica tu pagina o tus redes y te dice que mejorar",
+  "main": "servidor.js",
+  "scripts": {
+    "start": "node servidor.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.128.0",
+    "zod": "^4.6.5"
+  }
+}
