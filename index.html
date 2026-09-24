@@ -16,7 +16,8 @@
       --tinta:#0B0005;
       --texto:#1A0710;
       --apagado:#6E5A63;
-      --linea:rgba(11,0,5,.10);
+      --linea:rgba(11,0,5,.14);
+      --linea-fuerte:rgba(11,0,5,.28);
 
       --rosa:#B21A52;
       --vino:#70012B;
@@ -37,82 +38,225 @@
       font-size:16px;
       line-height:1.6;
       -webkit-font-smoothing:antialiased;
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
     }
 
     .contenedor{
       width:100%;
-      max-width:1180px;
+      max-width:760px;
       margin:0 auto;
       padding:0 32px;
     }
     @media (max-width:640px){
-      .contenedor{padding:0 20px;}
+      .contenedor{padding:0 22px;}
     }
 
-    /* ---------- cabecera ---------- */
-    .cabecera{
-      padding:26px 0;
-      border-bottom:1px solid var(--linea);
-    }
-    .cabecera .contenedor{
+    /* ---------- entrada ---------- */
+    .entrada{
+      min-height:100svh;
       display:flex;
       align-items:center;
-      justify-content:space-between;
-      gap:24px;
+      padding:80px 0;
     }
-    .marca{
-      display:inline-flex;
-      align-items:center;
-      text-decoration:none;
-    }
-    .marca svg{
-      height:30px;
-      width:auto;
-      display:block;
-    }
-    .marca:focus-visible{
-      outline:2px solid var(--rosa);
-      outline-offset:6px;
+    .bloque{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
     }
 
-    /* ---------- lienzo ---------- */
-    .lienzo{
+    .saludo{
+      font-family:var(--fuente-marca);
+      font-weight:600;
+      font-size:clamp(1.9rem,5.4vw,3.1rem);
+      line-height:1.16;
+      letter-spacing:-.03em;
+      margin:0;
+      color:var(--texto);
+      text-wrap:balance;
+    }
+    /* la palabra lumo es la marca: mismo tipo, peso Black y el degradado rasante */
+    .saludo .logo{
+      font-family:var(--fuente-marca);
+      font-weight:800;
+      letter-spacing:-.045em;
+      color:var(--vino);
+    }
+    @supports (-webkit-background-clip:text) or (background-clip:text){
+      .saludo .logo{
+        background:linear-gradient(90deg,
+          var(--rosa) 0%,
+          var(--vino) 34%,
+          var(--vino-hondo) 72%,
+          var(--negro) 100%);
+        -webkit-background-clip:text;
+        background-clip:text;
+        color:transparent;
+      }
+    }
+
+    .pregunta{
+      font-size:1.12rem;
+      color:var(--apagado);
+      margin:0 0 14px;
+    }
+
+    /* ---------- fila de acciones ---------- */
+    .acciones{
+      display:flex;
+      align-items:stretch;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+
+    .boton{
+      font-family:var(--fuente-texto);
+      font-size:1rem;
+      font-weight:600;
+      color:var(--blanco);
+      background:var(--vino);
+      border:none;
+      height:60px;
+      padding:0 30px;
+      cursor:pointer;
+      white-space:nowrap;
+      transition:background .18s ease;
+    }
+    .boton:hover{background:var(--rosa);}
+    .boton[aria-pressed="true"]{
+      background:var(--blanco);
+      color:var(--vino);
+      box-shadow:inset 0 0 0 1.5px var(--vino);
+    }
+    .boton[aria-pressed="true"]:hover{
+      background:var(--vino);
+      color:var(--blanco);
+    }
+    .boton:focus-visible{
+      outline:2px solid var(--vino);
+      outline-offset:3px;
+    }
+
+    .caja{
       flex:1;
+      min-width:280px;
+      display:flex;
+      align-items:center;
+      height:60px;
+      background:var(--blanco);
+      border:1.5px solid var(--linea-fuerte);
+      transition:border-color .18s ease;
+    }
+    .caja:focus-within{border-color:var(--vino);}
+
+    .caja input{
+      flex:1;
+      min-width:0;
+      height:100%;
+      border:none;
+      outline:none;
+      background:transparent;
+      padding:0 18px;
+      font-family:var(--fuente-texto);
+      font-size:1rem;
+      color:var(--texto);
+    }
+    .caja input::placeholder{color:var(--apagado);}
+
+    .enviar{
+      height:100%;
+      width:58px;
+      flex:0 0 auto;
+      border:none;
+      background:transparent;
+      color:var(--vino);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:background .18s ease, color .18s ease;
+    }
+    .enviar:hover{background:var(--vino);color:var(--blanco);}
+    .enviar:focus-visible{outline:2px solid var(--vino);outline-offset:-4px;}
+    .enviar svg{width:20px;height:20px;display:block;}
+
+    @media (max-width:560px){
+      .acciones{flex-direction:column;}
+      .boton{width:100%;}
+      .caja{width:100%;min-width:0;}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      *{transition:none !important;}
     }
   </style>
 </head>
 <body>
 
-  <header class="cabecera">
-    <div class="contenedor">
+  <main class="entrada">
+    <div class="contenedor bloque">
 
-      <a class="marca" href="/" aria-label="Lumo, inicio">
-        <svg viewBox="0 0 520 132" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lumo">
-          <defs>
-            <linearGradient id="lumo-rasante" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%"   stop-color="#B21A52"/>
-              <stop offset="34%"  stop-color="#70012B"/>
-              <stop offset="72%"  stop-color="#25000E"/>
-              <stop offset="100%" stop-color="#000000"/>
-            </linearGradient>
-          </defs>
-          <text x="260" y="98" text-anchor="middle"
-                font-family="Unbounded, sans-serif" font-weight="800"
-                font-size="86" letter-spacing="-2" fill="url(#lumo-rasante)">lumo</text>
-        </svg>
-      </a>
+      <h1 class="saludo">
+        Bienvenid@ a
+        <span class="logo">lumo</span>
+      </h1>
 
-    </div>
-  </header>
+      <p class="pregunta">¿Ya tienes página web?</p>
 
-  <main class="lienzo">
-    <div class="contenedor">
-      <!-- Aquí vamos construyendo, paso a paso -->
+      <div class="acciones">
+
+        <button class="boton" id="redes" type="button" aria-pressed="false">Pon tus redes si no tienes</button>
+
+        <form class="caja" action="#" method="get">
+          <label for="url" hidden>Dirección de tu página</label>
+          <input id="url" name="url" type="url" inputmode="url" placeholder="pega aquí tu página" autocomplete="url">
+          <button class="enviar" type="submit" aria-label="Calificar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" aria-hidden="true">
+              <path d="M4 12h15"/>
+              <path d="M13 6l6 6-6 6"/>
+            </svg>
+          </button>
+        </form>
+
+      </div>
+
     </div>
   </main>
+
+  <script>
+    // El boton alterna la caja entre pagina web y redes sociales
+    (function(){
+      const boton = document.getElementById('redes');
+      const campo = document.getElementById('url');
+      const etiqueta = document.querySelector('label[for="url"]');
+
+      const modos = {
+        pagina: {
+          texto:'Pon tus redes si no tienes',
+          marcador:'pega aquí tu página',
+          tipo:'url',
+          etiqueta:'Dirección de tu página'
+        },
+        redes: {
+          texto:'Tengo página web',
+          marcador:'pega aquí tu Instagram, Facebook o TikTok',
+          tipo:'text',
+          etiqueta:'Dirección de tus redes'
+        }
+      };
+
+      boton.addEventListener('click', function(){
+        const enRedes = boton.getAttribute('aria-pressed') === 'true';
+        const modo = enRedes ? modos.pagina : modos.redes;
+
+        boton.setAttribute('aria-pressed', String(!enRedes));
+        boton.textContent = modo.texto;
+        campo.type = modo.tipo;
+        campo.placeholder = modo.marcador;
+        etiqueta.textContent = modo.etiqueta;
+        campo.value = '';
+        campo.focus();
+      });
+    })();
+  </script>
 
 </body>
 </html>
