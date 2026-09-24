@@ -30,7 +30,8 @@
       --fuente:'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
       --titular:clamp(2.9rem,8.8vw,6.2rem);
-      --redondo:999px;
+      --redondo:18px;
+      --redondo-chico:13px;
 
       --curva:cubic-bezier(.16,.84,.26,1);
       --curva-suave:cubic-bezier(.4,0,.2,1);
@@ -204,7 +205,7 @@
       position:relative;flex:1;min-width:0;
       display:flex;align-items:center;gap:8px;
       height:76px;
-      padding:0 10px 0 30px;
+      padding:0 10px 0 26px;
       background:rgba(255,255,255,.72);
       backdrop-filter:blur(8px);
       -webkit-backdrop-filter:blur(8px);
@@ -228,7 +229,7 @@
 
     .enviar{
       width:58px;height:58px;flex:0 0 auto;
-      border:none;border-radius:50%;
+      border:none;border-radius:var(--redondo-chico);
       background:var(--vino);
       color:var(--blanco);
       cursor:pointer;
@@ -248,6 +249,7 @@
       .boton{width:100%;height:68px;}
       .caja{height:68px;}
       .enviar{width:52px;height:52px;}
+      .caja{padding-left:22px;}
     }
 
     @media (prefers-reduced-motion:reduce){
