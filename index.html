@@ -37,6 +37,13 @@
       --curva-suave:cubic-bezier(.4,0,.2,1);
     }
 
+    /* angulo animable para la luz que recorre el borde */
+    @property --angulo{
+      syntax:'<angle>';
+      initial-value:0deg;
+      inherits:false;
+    }
+
     *{box-sizing:border-box;}
     html,body{margin:0;padding:0;}
     body{
@@ -214,9 +221,36 @@
       transition:border-color .32s var(--curva-suave), box-shadow .4s var(--curva-suave);
     }
     .caja:focus-within{
-      border-color:transparent;
-      box-shadow:0 0 0 1.5px var(--vino), 0 16px 40px -16px rgba(112,1,43,.5);
+      border-color:rgba(11,0,5,.10);
+      box-shadow:0 16px 40px -16px rgba(112,1,43,.45);
     }
+
+    /* la luz da vueltas por el borde mientras estas dentro */
+    .caja::before{
+      content:"";
+      position:absolute;
+      inset:-1.5px;
+      border-radius:inherit;
+      padding:1.6px;
+      background:conic-gradient(from var(--angulo),
+        rgba(178,26,82,0)   0deg,
+        var(--rosa)        50deg,
+        var(--vino)       105deg,
+        rgba(112,1,43,0)  175deg,
+        rgba(178,26,82,0) 360deg);
+      -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor;
+      mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask-composite:exclude;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .4s var(--curva-suave);
+    }
+    .caja:focus-within::before{
+      opacity:1;
+      animation:girar 3.4s linear infinite;
+    }
+    @keyframes girar{ to{ --angulo:360deg; } }
     .caja input{
       flex:1;min-width:0;height:100%;
       border:none;outline:none;background:transparent;padding:0;
@@ -404,12 +438,14 @@
     }
     escribir();
 
-    campo.addEventListener('focus', function(){
-      clearTimeout(reloj);
-      campo.placeholder = prefijo[modo].replace(/, ej\. $/,'');
-    });
-    campo.addEventListener('blur', function(){
-      if(!campo.value) escribir();
+    // la caja sigue viva aunque estes dentro: solo se calla cuando de verdad escribes
+    campo.addEventListener('input', function(){
+      if(campo.value){
+        clearTimeout(reloj);
+        campo.placeholder = '';
+      }else{
+        escribir();
+      }
     });
 
     /* ---------- el boton alterna entre pagina y redes ---------- */
