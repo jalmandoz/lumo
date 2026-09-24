@@ -41,6 +41,22 @@ en Instagram. Antes que calificarlo mal sin saber, no se pregunta.
 
 Tampoco se ven las publicaciones en sí, ni sus fotos ni sus textos. Solo el escaparate.
 
+## Las reglas de primera impresión
+
+Sin la clave de Anthropic, este paso lo resuelven reglas. Revisan:
+
+- Que haya título y que no sea el que dejó la plantilla ("Inicio", "Untitled", "Mi sitio")
+- Que el título o el titular digan a qué te dedicas
+- Que digan dónde trabajas
+- Que el titular no sea un saludo vacío ("Bienvenidos a nuestra web")
+- Que el titular tenga entre tres y catorce palabras
+- Que haya forma de contactar desde arriba
+- Que no haya frases de relleno ("calidad y compromiso", "líderes en el mercado")
+- Que no esté todo en mayúsculas
+- Que no haya más de dos signos de exclamación arriba
+- Que no repitas el nombre de tu empresa más de tres veces
+- Que haya descripción para Google
+
 ## Pendiente
 
 - **Velocidad con Google.** La API de PageSpeed da el número oficial. Es gratis pero hace

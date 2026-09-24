@@ -5,6 +5,15 @@ const { juicioDeClaude } = require('./juicio');
 
 const PALABRAS_RUBRO = /(inmobiliari|propiedad|apartament|casa|terreno|local|oficina|alquiler|arriendo|venta|vender|comprar|bienes ra[ií]ces|realty|realtor|corredor)/i;
 const PALABRAS_LUGAR = /(caracas|valencia|maracaibo|barquisimeto|maracay|m[eé]rida|puerto la cruz|margarita|barcelona|maturin|lechería|venezuela|miranda|zulia|carabobo|anzo[aá]tegui|aragua|lara)/i;
+// Titulares que no dicen nada. Los ve cualquiera y sigue de largo.
+const TITULAR_VACIO = /^(bienvenid[oa]s?|welcome|inicio|home|hola|nuestra? (web|p[aá]gina|sitio)|p[aá]gina (web|principal)|bienvenid[oa]s? a (nuestr[oa] )?(web|p[aá]gina|sitio))\b/i;
+
+// Frases de relleno que suenan bien y no dicen nada.
+const RELLENO = /(calidad,? (confianza|compromiso|servicio)|l[ií]deres en el mercado|tu mejor opci[oó]n|la mejor opci[oó]n|soluciones integrales|excelencia|compromiso y dedicaci[oó]n|a[ñn]os de experiencia en el mercado|nos caracterizamos|somos una empresa (dedicada|comprometida|l[ií]der))/i;
+
+// Titulos que quedaron como los dejo la plantilla.
+const TITULO_PLANTILLA = /^(home|inicio|untitled|sin t[ií]tulo|documento sin t[ií]tulo|mi sitio|my site|sitio web|p[aá]gina web|just another wordpress site|new page|nueva p[aá]gina)$/i;
+
 const PALABRAS_NOSOTROS = /(qui[eé]nes somos|sobre nosotros|nuestra historia|acerca de|conoc[eé]nos|nuestro equipo|about)/i;
 const PALABRAS_TESTIMONIO = /(testimoni|opiniones|rese[ñn]as|lo que dicen|clientes satisfechos|recomendaci[oó]n)/i;
 
@@ -52,8 +61,33 @@ async function analizarWeb(destino) {
   const tituloLimpio = U.desescapar(titulo || '').trim();
   const descripcion = U.meta(html, 'description');
   const h1 = U.desescapar(((html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || [])[1] || '').replace(/<[^>]+>/g, '')).trim();
-  const arriba = html.slice(0, Math.floor(html.length * 0.4));
+  // En paginas cortas el 40% se queda muy atras, por eso el minimo de 4000.
+  const arriba = html.slice(0, Math.max(4000, Math.floor(html.length * 0.4)));
   const ctaArriba = /(wa\.me|api\.whatsapp|href=["']tel:)/i.test(arriba);
+
+  // ---------- lo que se lee en la parte de arriba ----------
+  const encabezado = texto.slice(0, 700);
+  const titularVacio = TITULAR_VACIO.test((h1 || tituloLimpio).trim());
+  const hayRelleno = RELLENO.test(encabezado);
+  const tituloPlantilla = TITULO_PLANTILLA.test(tituloLimpio.trim());
+
+  // grito: mas de la mitad de las letras en mayuscula
+  const letras = encabezado.replace(/[^a-záéíóúñA-ZÁÉÍÓÚÑ]/g, '');
+  const mayusculas = encabezado.replace(/[^A-ZÁÉÍÓÚÑ]/g, '').length;
+  const grita = letras.length > 140 && mayusculas / letras.length > 0.6;
+
+  // exclamaciones de mas
+  const gritos = (encabezado.match(/!/g) || []).length;
+
+  // la marca repetida hasta el cansancio
+  const marca = (r.url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('.')[0] || '')
+    .replace(/[^a-z0-9]/gi, '');
+  const vecesMarca = marca.length > 3
+    ? (encabezado.match(new RegExp(marca, 'gi')) || []).length
+    : 0;
+
+  // titular ni muy corto ni interminable
+  const palabrasH1 = h1 ? h1.trim().split(/\s+/).length : 0;
 
   // ---------- confianza ----------
   const hayNosotros = PALABRAS_NOSOTROS.test(texto);
@@ -78,7 +112,9 @@ async function analizarWeb(destino) {
           ok: !!tituloLimpio && tituloLimpio.length > 8,
           peso: 2,
           bien: { t: 'Tienes título', d: 'La pestaña del navegador dice "' + tituloLimpio.slice(0, 70) + '".' },
-          mal: { t: 'La página no tiene título', d: 'Es lo primero que lee Google y lo que se ve en la pestaña. Hoy está vacío o es demasiado corto.' }
+          mal: tituloLimpio
+            ? { t: 'El título es demasiado corto', d: 'La pestaña dice "' + tituloLimpio + '". Eso es lo que lee Google. Dile lo que haces y dónde, te caben sesenta caracteres.' }
+            : { t: 'La página no tiene título', d: 'Es lo primero que lee Google y lo que se ve en la pestaña. Hoy está vacío.' }
         },
         {
           ok: PALABRAS_RUBRO.test(tituloLimpio + ' ' + h1),
@@ -109,7 +145,51 @@ async function analizarWeb(destino) {
           peso: 1,
           bien: { t: 'Tienes descripción para Google', d: 'Es el texto que sale debajo de tu enlace en las búsquedas.' },
           mal: { t: 'Falta la descripción para Google', d: 'Google se inventa el texto que aparece bajo tu enlace. Escríbelo tú en dos líneas.' }
-        }
+        },
+        {
+          ok: !titularVacio,
+          peso: 3,
+          bien: null,
+          mal: { t: 'El titular no dice nada', d: 'Abre con "' + (h1 || tituloLimpio).slice(0, 45) + '". Eso lo puede poner cualquiera. Cambia ese espacio por lo que vendes y dónde.' }
+        },
+        {
+          ok: !tituloPlantilla,
+          peso: 2,
+          bien: null,
+          mal: { t: 'El título quedó como lo dejó la plantilla', d: 'La pestaña dice "' + tituloLimpio + '". Nadie cambió eso al montar la página, y Google lo lee tal cual.' }
+        },
+        {
+          ok: !hayRelleno,
+          peso: 2,
+          bien: null,
+          mal: { t: 'Arriba hay frases de relleno', d: 'Cosas como "calidad y compromiso" o "tu mejor opción" las dice todo el mundo. Cámbialas por un dato tuyo: cuántas propiedades manejas, cuántos años llevas, en qué zona.' }
+        },
+        {
+          ok: !grita,
+          peso: 2,
+          bien: null,
+          mal: { t: 'Está casi todo en mayúsculas', d: 'En pantalla las mayúsculas se leen como un grito y cuestan más de leer. Déjalas para el logo.' }
+        },
+        {
+          ok: gritos <= 2,
+          peso: 1,
+          bien: null,
+          mal: { t: 'Hay ' + gritos + ' signos de exclamación arriba', d: 'Cuando todo es urgente, nada lo es. Quita los que puedas y deja el mensaje solo.' }
+        },
+        vecesMarca ? {
+          ok: vecesMarca <= 3,
+          peso: 2,
+          bien: null,
+          mal: { t: 'Repites tu nombre ' + vecesMarca + ' veces', d: 'Quien llega ya sabe dónde está. Ese espacio sirve mejor para decirle qué puede conseguir contigo.' }
+        } : null,
+        h1 ? {
+          ok: palabrasH1 >= 3 && palabrasH1 <= 14,
+          peso: 2,
+          bien: null,
+          mal: palabrasH1 < 3
+            ? { t: 'El titular es demasiado corto', d: '"' + h1 + '" no alcanza a decir nada. Con seis u ocho palabras cuentas qué vendes y dónde.' }
+            : { t: 'El titular es demasiado largo', d: palabrasH1 + ' palabras. Nadie lee un párrafo de entrada. Déjalo en una línea que se lea de un golpe.' }
+        } : null
       ])
     },
     {

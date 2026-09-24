@@ -110,7 +110,7 @@ function calificar(comprobaciones) {
     .map(c => ({ bien: true, t: c.bien.t, d: c.bien.d }));
 
   // Primero lo que esta bien (maximo dos, para no tapar lo importante), luego lo que falta.
-  return { puntaje, hallazgos: buenos.slice(0, 2).concat(malos.slice(0, 4)) };
+  return { puntaje, hallazgos: buenos.slice(0, 2).concat(malos.slice(0, 5)) };
 }
 
 module.exports = {
