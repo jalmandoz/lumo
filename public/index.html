@@ -408,6 +408,23 @@
       to  {left:110%;}
     }
 
+    .firma{
+      position:absolute;
+      left:50%;bottom:clamp(28px,5vh,52px);
+      transform:translateX(-50%);
+      display:flex;flex-direction:column;align-items:center;gap:11px;
+      animation:asomar-firma .9s var(--curva) 1.1s backwards;
+    }
+    @keyframes asomar-firma{from{opacity:0;}to{opacity:1;}}
+    .firma .por{
+      font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:lowercase;
+      color:var(--apagado);opacity:.75;
+    }
+    .firma img{
+      display:block;
+      width:clamp(118px,17vw,156px);height:auto;
+    }
+
     .cargando-txt{
       margin-top:18px;
       font-size:.95rem;
@@ -646,6 +663,11 @@
       <span class="logo-carga">lumo</span>
       <div class="barra"><span class="relleno"></span></div>
       <span class="cargando-txt">cargando<span class="puntos"><i>.</i><i>.</i><i>.</i></span></span>
+    </div>
+
+    <div class="firma">
+      <span class="por">powered by</span>
+      <img src="at-designs.png" alt="AT Designs" width="3066" height="714">
     </div>
   </div>
 
